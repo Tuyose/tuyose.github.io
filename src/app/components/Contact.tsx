@@ -3,9 +3,8 @@ import { motion } from "motion/react";
 
 const LINKS = [
   { icon: Github, label: "GitHub", handle: "@Tuyose", url: "https://github.com/Tuyose" },
-  { icon: Twitter, label: "Twitter", handle: "@Tuyose", url: "https://twitter.com/Tuyose" },
-  { icon: Linkedin, label: "LinkedIn", handle: "Tuyose", url: "https://www.linkedin.com/in/Tuyose" },
-  { icon: Mail, label: "Email", handle: "hello@tuyose.dev", url: "mailto:hello@tuyose.dev" },
+  { icon: Linkedin, label: "LinkedIn", handle: "Yusuf Altunbaş", url: "https://www.linkedin.com/in/yusufaltunbas/" },
+  { icon: Mail, label: "Email", handle: "yavuzyusufaltunbas@gmail.com", url: "mailto:yavuzyusufaltunbas@gmail.com" },
 ];
 
 export function Contact() {

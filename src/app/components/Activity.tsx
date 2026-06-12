@@ -72,9 +72,18 @@ function normalizeEvent(event: any) {
   }
 }
 
-const RECENT_ACTIVITY: { action: string; target: string; branch: string; time: string }[] = [];
-
 export function Activity() {
+  const [recentActivity, setRecentActivity] = useState<{ action: string; target: string; branch: string; time: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchGitHubEvents().then((events) => {
+      const normalized = events.slice(0, 10).map((event) => normalizeEvent(event));
+      setRecentActivity(normalized);
+      setLoading(false);
+    });
+  }, []);
+
   return (
     <section id="activity" className="py-24 px-6 md:px-16 lg:px-24">
       <div className="max-w-6xl mx-auto">
@@ -151,32 +160,42 @@ export function Activity() {
             <div className="font-mono text-xs mb-5" style={{ color: "#6b8a6b" }}>
               recent activity
             </div>
-            <div className="flex flex-col gap-4">
-              {RECENT_ACTIVITY.map((item, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: 10 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.3, delay: i * 0.07 }}
-                  className="flex flex-col gap-1 pb-4"
-                  style={{ borderBottom: i < RECENT_ACTIVITY.length - 1 ? "1px solid rgba(0,255,135,0.06)" : "none" }}
-                >
-                  <div className="font-mono text-xs" style={{ color: "#6b8a6b" }}>
-                    {item.action}{" "}
-                    <span style={{ color: "#00ff87" }}>{item.target}</span>
-                  </div>
-                  {item.branch && (
-                    <div className="font-mono text-xs" style={{ color: "rgba(0,255,135,0.4)" }}>
-                      ⎇ {item.branch}
+            {loading ? (
+              <div className="font-mono text-xs" style={{ color: "rgba(107,138,107,0.5)" }}>
+                Loading activity…
+              </div>
+            ) : recentActivity.length > 0 ? (
+              <div className="flex flex-col gap-4">
+                {recentActivity.map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: 10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.3, delay: i * 0.07 }}
+                    className="flex flex-col gap-1 pb-4"
+                    style={{ borderBottom: i < recentActivity.length - 1 ? "1px solid rgba(0,255,135,0.06)" : "none" }}
+                  >
+                    <div className="font-mono text-xs" style={{ color: "#6b8a6b" }}>
+                      {item.action}{" "}
+                      <span style={{ color: "#00ff87" }}>{item.target}</span>
                     </div>
-                  )}
-                  <div className="font-mono text-xs" style={{ color: "rgba(107,138,107,0.5)" }}>
-                    {item.time}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                    {item.branch && (
+                      <div className="font-mono text-xs" style={{ color: "rgba(0,255,135,0.4)" }}>
+                        ⎇ {item.branch}
+                      </div>
+                    )}
+                    <div className="font-mono text-xs" style={{ color: "rgba(107,138,107,0.5)" }}>
+                      {item.time}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="font-mono text-xs" style={{ color: "rgba(107,138,107,0.5)" }}>
+                No recent activity
+              </div>
+            )}
           </div>
         </div>
       </div>

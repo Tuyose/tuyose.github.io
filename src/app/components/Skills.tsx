@@ -1,45 +1,102 @@
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
+import { fetchGitHubRepos } from "../services/github";
 
-const SKILL_GROUPS = [
-  {
-    category: "Languages",
-    skills: [
-      { name: "TypeScript", level: 95 },
-      { name: "Rust", level: 85 },
-      { name: "Go", level: 80 },
-      { name: "Python", level: 75 },
-      { name: "C / C++", level: 60 },
-    ],
-  },
-  {
-    category: "Frontend",
-    skills: [
-      { name: "React / Next.js", level: 95 },
-      { name: "CSS / Tailwind", level: 90 },
-      { name: "WebGL / WebAssembly", level: 65 },
-      { name: "Svelte", level: 55 },
-      { name: "Three.js", level: 50 },
-    ],
-  },
-  {
-    category: "Infrastructure",
-    skills: [
-      { name: "Kubernetes", level: 85 },
-      { name: "PostgreSQL", level: 90 },
-      { name: "Redis", level: 85 },
-      { name: "Kafka", level: 75 },
-      { name: "Terraform", level: 70 },
-    ],
-  },
+const PREDEFINED_TOOLS = [
+  "Git", "GitHub", "Docker", "Linux", "macOS", "Windows",
+  "VS Code", "Terminal", "Bash", "PowerShell", "npm", "pnpm",
 ];
 
-const TOOLS = [
-  "Neovim", "tmux", "Git", "Docker", "GitHub Actions",
-  "Nix", "Linux", "macOS", "AWS", "GCP",
-  "Prometheus", "Grafana", "Loki", "OpenTelemetry", "Datadog",
-];
+const SKILL_LEVELS: Record<string, number> = {
+  TypeScript: 95,
+  JavaScript: 90,
+  Python: 80,
+  Rust: 85,
+  Go: 75,
+  C: 70,
+  "C++": 65,
+  Java: 75,
+  PHP: 60,
+  Shell: 85,
+  HTML: 90,
+  CSS: 85,
+  React: 95,
+  Vue: 70,
+  Node: 90,
+};
 
 export function Skills() {
+  const [repos, setRepos] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchGitHubRepos().then((data) => {
+      setRepos(data);
+      setLoading(false);
+    });
+  }, []);
+
+  const skillGroups = useMemo(() => {
+    // Extract languages from repos
+    const langMap: Record<string, number> = {};
+    repos.forEach((repo) => {
+      if (repo.language) {
+        langMap[repo.language] = (langMap[repo.language] || 0) + 1;
+      }
+    });
+
+    // Sort by frequency
+    const languages = Object.entries(langMap)
+      .sort(([, a], [, b]) => b - a)
+      .map(([lang]) => ({
+        name: lang,
+        level: SKILL_LEVELS[lang] || 70,
+      }));
+
+    return [
+      {
+        category: "Languages",
+        skills: languages.slice(0, 5),
+      },
+      {
+        category: "Frontend",
+        skills: [
+          { name: "React", level: 95 },
+          { name: "TypeScript", level: 95 },
+          { name: "CSS / Tailwind", level: 90 },
+          { name: "HTML", level: 90 },
+        ],
+      },
+      {
+        category: "Backend & Tools",
+        skills: [
+          { name: "Node.js", level: 90 },
+          { name: "Git", level: 95 },
+          { name: "Docker", level: 80 },
+          { name: "Linux", level: 85 },
+        ],
+      },
+    ];
+  }, [repos]);
+
+  if (loading) {
+    return (
+      <section id="skills" className="py-24 px-6 md:px-16 lg:px-24 relative">
+        <div className="max-w-6xl mx-auto">
+          <div className="font-mono text-xs mb-2" style={{ color: "#00ff87" }}>
+            // technical profile
+          </div>
+          <h2 className="font-sans" style={{ fontWeight: 700, fontSize: "2.25rem", color: "#e8f0e8" }}>
+            Skills & Stack
+          </h2>
+          <div className="mt-12 font-mono text-sm" style={{ color: "#6b8a6b" }}>
+            Loading skills…
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="skills" className="py-24 px-6 md:px-16 lg:px-24 relative">
       <div className="max-w-6xl mx-auto">
@@ -53,7 +110,7 @@ export function Skills() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          {SKILL_GROUPS.map((group, gi) => (
+          {skillGroups.map((group, gi) => (
             <motion.div
               key={group.category}
               initial={{ opacity: 0, y: 20 }}
@@ -107,7 +164,7 @@ export function Skills() {
             // tools & environment
           </div>
           <div className="flex flex-wrap gap-2">
-            {TOOLS.map((tool) => (
+            {PREDEFINED_TOOLS.map((tool) => (
               <span
                 key={tool}
                 className="font-mono text-xs px-3 py-1.5 transition-all duration-150 cursor-default"

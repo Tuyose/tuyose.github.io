@@ -37,6 +37,16 @@ export async function fetchGitHubUser(): Promise<GitHubUser | null> {
   }
 }
 
+export interface GitHubEvent {
+  id: string;
+  type: string;
+  repo?: {
+    name: string;
+  };
+  payload?: any;
+  created_at: string;
+}
+
 export async function fetchGitHubRepos(): Promise<GitHubRepo[]> {
   try {
     const response = await fetch(
@@ -52,6 +62,24 @@ export async function fetchGitHubRepos(): Promise<GitHubRepo[]> {
     return repos.filter((repo: GitHubRepo) => !repo.private);
   } catch (error) {
     console.error("Error fetching GitHub repos:", error);
+    return [];
+  }
+}
+
+export async function fetchGitHubEvents(): Promise<GitHubEvent[]> {
+  try {
+    const response = await fetch(
+      `${GITHUB_API}/users/${GITHUB_USERNAME}/events/public?per_page=30`,
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+        },
+      }
+    );
+    if (!response.ok) throw new Error("Failed to fetch events");
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching GitHub events:", error);
     return [];
   }
 }

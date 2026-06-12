@@ -1,49 +1,21 @@
+import { useEffect, useState } from "react";
 import { ExternalLink, Github } from "lucide-react";
 import { motion } from "motion/react";
-
-const PROJECTS = [
-  {
-    id: 1,
-    title: "Flux Runtime",
-    tagline: "Async runtime for Rust",
-    description:
-      "A production-grade async runtime built from scratch in Rust. Features a work-stealing thread pool, timer wheel, io_uring integration for Linux, and a fully compatible Tokio API surface. Used by 3 production services handling 200k req/s.",
-    stack: ["Rust", "io_uring", "MPSC", "epoll"],
-    metrics: ["200k req/s", "0.3ms p99", "4k GitHub stars"],
-    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=450&fit=crop&auto=format",
-    demo: "#",
-    repo: "#",
-    accent: "#00ff87",
-  },
-  {
-    id: 2,
-    title: "NextQL",
-    tagline: "Type-safe GraphQL for Next.js",
-    description:
-      "End-to-end type safety from your database schema to React components — zero boilerplate. Auto-generates hooks, normalized caching, real-time subscriptions, and optimistic updates. Drops in to replace Apollo or urql in minutes.",
-    stack: ["TypeScript", "GraphQL", "Next.js", "React"],
-    metrics: ["<3kb gzip", "99.8% cache hit", "500+ users"],
-    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=450&fit=crop&auto=format",
-    demo: "#",
-    repo: "#",
-    accent: "#00c4ff",
-  },
-  {
-    id: 3,
-    title: "pgStream",
-    tagline: "PostgreSQL → anywhere, in real-time",
-    description:
-      "Change Data Capture pipeline that streams Postgres WAL events to Kafka, Redis Streams, webhooks, or S3. Handles schema migrations gracefully, guaranteed delivery with exactly-once semantics, and a built-in web dashboard.",
-    stack: ["Go", "PostgreSQL", "Kafka", "Docker"],
-    metrics: ["50k events/s", "Exactly-once", "No data loss"],
-    image: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=800&h=450&fit=crop&auto=format",
-    demo: "#",
-    repo: "#",
-    accent: "#ff6b6b",
-  },
-];
+import { fetchGitHubRepos, type GitHubRepo } from "../services/github";
 
 export function Projects() {
+  const [projects, setProjects] = useState<GitHubRepo[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchGitHubRepos().then((repos) => {
+      setProjects(repos.slice(0, 3));
+      setLoading(false);
+    });
+  }, []);
+
+  const accentColors = ["#00ff87", "#00c4ff", "#ff6b6b"];
+
   return (
     <section id="projects" className="py-24 px-6 md:px-16 lg:px-24">
       <div
@@ -60,119 +32,134 @@ export function Projects() {
           </h2>
         </div>
 
-        <div className="flex flex-col gap-20">
-          {PROJECTS.map((project, i) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.6 }}
-              className={`grid grid-cols-1 lg:grid-cols-2 gap-8 items-center ${
-                i % 2 === 1 ? "lg:[direction:rtl]" : ""
-              }`}
-            >
-              {/* Image */}
-              <div
-                className="relative overflow-hidden group"
-                style={{
-                  borderRadius: "4px",
-                  border: `1px solid rgba(${project.accent === "#00ff87" ? "0,255,135" : project.accent === "#00c4ff" ? "0,196,255" : "255,107,107"},0.15)`,
-                  ...(i % 2 === 1 ? { direction: "ltr" } : {}),
-                }}
+        {loading ? (
+          <div className="text-center font-mono text-sm" style={{ color: "#6b8a6b" }}>
+            Loading projects…
+          </div>
+        ) : (
+          <div className="flex flex-col gap-20">
+            {projects.map((project, i) => (
+              <motion.div
+                key={project.id}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.6 }}
+                className={`grid grid-cols-1 lg:grid-cols-2 gap-8 items-center ${
+                  i % 2 === 1 ? "lg:[direction:rtl]" : ""
+                }`}
               >
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+                {/* Image placeholder */}
                 <div
-                  className="absolute inset-0"
-                  style={{ background: `linear-gradient(135deg, ${project.accent}20, transparent 60%)` }}
-                />
-                <div
-                  className="absolute top-3 left-3 font-mono text-xs px-2 py-1"
+                  className="relative overflow-hidden group"
                   style={{
-                    background: "rgba(10,14,15,0.85)",
-                    color: project.accent,
-                    border: `1px solid ${project.accent}40`,
-                    borderRadius: "2px",
-                    backdropFilter: "blur(4px)",
+                    borderRadius: "4px",
+                    border: `1px solid ${accentColors[i]}40`,
+                    background: `linear-gradient(135deg, ${accentColors[i]}10, transparent 60%)`,
+                    aspectRatio: "16 / 9",
+                    ...(i % 2 === 1 ? { direction: "ltr" } : {}),
                   }}
                 >
-                  {project.tagline}
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Github size={48} style={{ color: accentColors[i], opacity: 0.5 }} />
+                  </div>
+                  <div
+                    className="absolute top-3 left-3 font-mono text-xs px-2 py-1"
+                    style={{
+                      background: "rgba(10,14,15,0.85)",
+                      color: accentColors[i],
+                      border: `1px solid ${accentColors[i]}40`,
+                      borderRadius: "2px",
+                      backdropFilter: "blur(4px)",
+                    }}
+                  >
+                    {project.language || "Mixed"}
+                  </div>
                 </div>
-              </div>
 
-              {/* Content */}
-              <div style={i % 2 === 1 ? { direction: "ltr" } : {}}>
-                <h3
-                  className="font-sans mb-3"
-                  style={{ fontWeight: 700, fontSize: "1.75rem", color: "#e8f0e8" }}
-                >
-                  {project.title}
-                </h3>
+                {/* Content */}
+                <div style={i % 2 === 1 ? { direction: "ltr" } : {}}>
+                  <h3
+                    className="font-sans mb-3"
+                    style={{ fontWeight: 700, fontSize: "1.75rem", color: "#e8f0e8" }}
+                  >
+                    {project.name}
+                  </h3>
 
-                <p className="font-sans text-sm mb-6 leading-relaxed" style={{ color: "#6b8a6b" }}>
-                  {project.description}
-                </p>
+                  <p className="font-sans text-sm mb-6 leading-relaxed" style={{ color: "#6b8a6b" }}>
+                    {project.description || "Open source project on GitHub"}
+                  </p>
 
-                {/* Metrics */}
-                <div className="flex flex-wrap gap-4 mb-6">
-                  {project.metrics.map((m) => (
-                    <div key={m} className="text-center">
-                      <div className="font-mono text-sm font-semibold" style={{ color: project.accent }}>
-                        {m}
+                  {/* Stats */}
+                  <div className="flex flex-wrap gap-4 mb-6">
+                    {[
+                      { label: "Stars", value: project.stargazers_count.toLocaleString() },
+                      { label: "Forks", value: project.forks_count },
+                      { label: "Language", value: project.language || "Mixed" },
+                    ].map((stat) => (
+                      <div key={stat.label} className="text-center">
+                        <div className="font-mono text-sm font-semibold" style={{ color: accentColors[i] }}>
+                          {stat.value}
+                        </div>
+                        <div className="font-mono text-xs" style={{ color: "#6b8a6b" }}>
+                          {stat.label}
+                        </div>
                       </div>
+                    ))}
+                  </div>
+
+                  {/* Topics/Tags */}
+                  {project.topics && project.topics.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {project.topics.slice(0, 5).map((topic) => (
+                        <span
+                          key={topic}
+                          className="font-mono text-xs px-3 py-1"
+                          style={{
+                            background: "rgba(0,255,135,0.06)",
+                            color: "#6b8a6b",
+                            border: "1px solid rgba(0,255,135,0.12)",
+                            borderRadius: "2px",
+                          }}
+                        >
+                          {topic}
+                        </span>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  )}
 
-                {/* Stack */}
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {project.stack.map((tech) => (
-                    <span
-                      key={tech}
-                      className="font-mono text-xs px-3 py-1"
-                      style={{
-                        background: "rgba(0,255,135,0.06)",
-                        color: "#6b8a6b",
-                        border: "1px solid rgba(0,255,135,0.12)",
-                        borderRadius: "2px",
-                      }}
+                  {/* Links */}
+                  <div className="flex gap-4">
+                    <a
+                      href={project.homepage || project.html_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-2 font-mono text-sm transition-colors duration-150"
+                      style={{ color: accentColors[i] }}
+                      onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.opacity = "0.7")}
+                      onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.opacity = "1")}
                     >
-                      {tech}
-                    </span>
-                  ))}
+                      <ExternalLink size={14} />
+                      View Project
+                    </a>
+                    <a
+                      href={project.html_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-2 font-mono text-sm transition-colors duration-150"
+                      style={{ color: "#6b8a6b" }}
+                      onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "#e8f0e8")}
+                      onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "#6b8a6b")}
+                    >
+                      <Github size={14} />
+                      Source
+                    </a>
+                  </div>
                 </div>
-
-                {/* Links */}
-                <div className="flex gap-4">
-                  <a
-                    href={project.demo}
-                    className="flex items-center gap-2 font-mono text-sm transition-colors duration-150"
-                    style={{ color: project.accent }}
-                    onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.opacity = "0.7")}
-                    onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.opacity = "1")}
-                  >
-                    <ExternalLink size={14} />
-                    Live Demo
-                  </a>
-                  <a
-                    href={project.repo}
-                    className="flex items-center gap-2 font-mono text-sm transition-colors duration-150"
-                    style={{ color: "#6b8a6b" }}
-                    onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "#e8f0e8")}
-                    onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "#6b8a6b")}
-                  >
-                    <Github size={14} />
-                    Source
-                  </a>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
