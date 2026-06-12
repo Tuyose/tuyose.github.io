@@ -31,7 +31,7 @@ export function Nav() {
       <div className="max-w-6xl mx-auto px-6 md:px-16 lg:px-24 flex items-center justify-between h-14">
         {/* Logo */}
         <a href="#" className="font-mono text-sm font-semibold" style={{ color: "#00ff87" }}>
-          alex.dev<span className="animate-pulse">_</span>
+          tuyose.github.io<span className="animate-pulse">_</span>
         </a>
 
         {/* Desktop links */}
@@ -49,7 +49,7 @@ export function Nav() {
             </a>
           ))}
           <a
-            href="https://github.com"
+            href="https://github.com/Tuyose"
             target="_blank"
             rel="noreferrer"
             className="flex items-center gap-1.5 font-mono text-xs px-3 py-1.5 transition-all duration-150"

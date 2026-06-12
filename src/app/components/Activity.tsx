@@ -1,42 +1,78 @@
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
+import { fetchGitHubEvents, formatTimeAgo } from "../services/github";
 
-// Generate mock contribution data — 52 weeks × 7 days
-function generateContributions() {
-  const weeks = [];
-  for (let w = 0; w < 52; w++) {
-    const days = [];
-    for (let d = 0; d < 7; d++) {
-      // Weighted random with more active days
-      const rand = Math.random();
-      let count = 0;
-      if (rand > 0.55) count = Math.floor(Math.random() * 3) + 1;
-      if (rand > 0.75) count = Math.floor(Math.random() * 5) + 4;
-      if (rand > 0.92) count = Math.floor(Math.random() * 8) + 9;
-      days.push(count);
-    }
-    weeks.push(days);
-  }
-  return weeks;
-}
-
-const CONTRIBUTIONS = generateContributions();
+const CONTRIBUTIONS = Array.from({ length: 52 }, () =>
+  Array.from({ length: 7 }, () => Math.floor(Math.random() * 4))
+);
 
 function getColor(count: number) {
   if (count === 0) return "rgba(0,255,135,0.05)";
-  if (count <= 3) return "rgba(0,255,135,0.18)";
-  if (count <= 6) return "rgba(0,255,135,0.38)";
-  if (count <= 10) return "rgba(0,255,135,0.62)";
+  if (count <= 1) return "rgba(0,255,135,0.18)";
+  if (count <= 2) return "rgba(0,255,135,0.38)";
+  if (count <= 3) return "rgba(0,255,135,0.62)";
   return "#00ff87";
 }
 
-const RECENT_ACTIVITY = [
-  { action: "Pushed 3 commits to", target: "flux-runtime", repo: "flux-runtime", time: "2h ago", branch: "feat/io-uring" },
-  { action: "Opened PR #47 in", target: "nextql", repo: "nextql", time: "8h ago", branch: "cache-invalidation" },
-  { action: "Merged PR #203 in", target: "devenv", repo: "devenv", time: "1d ago", branch: "flake-update" },
-  { action: "Released v1.4.0 of", target: "pgstream", repo: "pgstream", time: "2d ago", branch: "main" },
-  { action: "Created repository", target: "c-arena", repo: "c-arena", time: "3d ago", branch: "main" },
-  { action: "Starred", target: "oven-sh/bun", repo: "bun", time: "3d ago", branch: "" },
-];
+function normalizeEvent(event: any) {
+  const repoName = event.repo?.name?.split("/")[1] || "repo";
+  const createdAt = event.created_at;
+  switch (event.type) {
+    case "PushEvent": {
+      const commitCount = event.payload?.size ?? 1;
+      return {
+        action: `Pushed ${commitCount} commit${commitCount === 1 ? "" : "s"} to`,
+        target: repoName,
+        branch: event.payload?.ref?.replace("refs/heads/", "") || "main",
+        time: formatTimeAgo(createdAt),
+      };
+    }
+    case "PullRequestEvent": {
+      const action = event.payload?.action === "closed" && event.payload?.pull_request?.merged
+        ? "Merged PR"
+        : event.payload?.action === "opened"
+        ? "Opened PR"
+        : "Updated PR";
+      const number = event.payload?.number || event.payload?.pull_request?.number || "?";
+      return {
+        action: `${action} #${number} in`,
+        target: repoName,
+        branch: event.payload?.pull_request?.head?.ref || "main",
+        time: formatTimeAgo(createdAt),
+      };
+    }
+    case "CreateEvent":
+      return {
+        action: "Created repository",
+        target: repoName,
+        branch: "",
+        time: formatTimeAgo(createdAt),
+      };
+    case "WatchEvent":
+      return {
+        action: "Starred",
+        target: repoName,
+        branch: "",
+        time: formatTimeAgo(createdAt),
+      };
+    case "IssuesEvent":
+      return {
+        action: `${event.payload?.action === "opened" ? "Opened issue" : "Updated issue"} #${event.payload?.issue?.number}`,
+        target: repoName,
+        branch: "",
+        time: formatTimeAgo(createdAt),
+      };
+    default:
+      return {
+        action: event.type.replace(/Event$/, ""),
+        target: repoName,
+        branch: "",
+        time: formatTimeAgo(createdAt),
+      };
+  }
+}
+
+const RECENT_ACTIVITY: { action: string; target: string; branch: string; time: string }[] = [];
 
 export function Activity() {
   return (

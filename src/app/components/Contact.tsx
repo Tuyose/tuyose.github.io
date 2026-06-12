@@ -2,10 +2,10 @@ import { Github, Twitter, Linkedin, Mail, Terminal } from "lucide-react";
 import { motion } from "motion/react";
 
 const LINKS = [
-  { icon: Github, label: "GitHub", handle: "@alexchen", url: "#" },
-  { icon: Twitter, label: "Twitter", handle: "@alexchendev", url: "#" },
-  { icon: Linkedin, label: "LinkedIn", handle: "alexchen", url: "#" },
-  { icon: Mail, label: "Email", handle: "alex@example.dev", url: "mailto:alex@example.dev" },
+  { icon: Github, label: "GitHub", handle: "@Tuyose", url: "https://github.com/Tuyose" },
+  { icon: Twitter, label: "Twitter", handle: "@Tuyose", url: "https://twitter.com/Tuyose" },
+  { icon: Linkedin, label: "LinkedIn", handle: "Tuyose", url: "https://www.linkedin.com/in/Tuyose" },
+  { icon: Mail, label: "Email", handle: "hello@tuyose.dev", url: "mailto:hello@tuyose.dev" },
 ];
 
 export function Contact() {

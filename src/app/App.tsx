@@ -69,10 +69,10 @@ export default function App() {
       >
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <span className="font-mono text-xs" style={{ color: "#6b8a6b" }}>
-            alex.dev — built with React + Tailwind
+            tuyose.github.io — built with React + Tailwind
           </span>
           <span className="font-mono text-xs" style={{ color: "rgba(107,138,107,0.4)" }}>
-            © 2026 Alex Chen. All rights reserved.
+            © 2026 Tuyose. All rights reserved.
           </span>
         </div>
       </footer>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Github, Terminal, ArrowDown } from "lucide-react";
 import { motion } from "motion/react";
+import { fetchGitHubUser, type GitHubUser } from "../services/github";
 
 const TYPING_STRINGS = [
   "Full-Stack Developer",
@@ -14,7 +15,18 @@ export function Hero() {
   const [stringIndex, setStringIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
   const [deleting, setDeleting] = useState(false);
+  const [user, setUser] = useState<GitHubUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
+  // Fetch GitHub user data
+  useEffect(() => {
+    fetchGitHubUser().then((userData) => {
+      setUser(userData);
+      setLoading(false);
+    });
+  }, []);
+
+  // Typing animation effect
   useEffect(() => {
     const current = TYPING_STRINGS[stringIndex];
     const timeout = setTimeout(
@@ -80,7 +92,7 @@ export function Hero() {
           className="font-sans mb-4"
           style={{ fontSize: "clamp(3rem, 8vw, 7rem)", fontWeight: 700, lineHeight: 1.05, color: "#e8f0e8" }}
         >
-          Alex <span style={{ color: "#00ff87" }}>Chen</span>
+          {loading ? "Loading..." : user?.name || user?.login || "Developer"} <span style={{ color: "#00ff87" }}>.</span>
         </motion.h1>
 
         <motion.div
@@ -107,8 +119,11 @@ export function Hero() {
           className="font-sans mb-12 max-w-2xl"
           style={{ fontSize: "1.1rem", lineHeight: 1.7, color: "#6b8a6b" }}
         >
-          I build things for the web and beyond. Passionate about distributed systems, developer tooling, and open source.
-          Currently crafting infrastructure at scale — one commit at a time.
+          {loading
+            ? "Loading profile..."
+            : user?.bio ||
+              "Open source developer building modern web apps, tools, and experiences."
+          }
         </motion.p>
 
         <motion.div
@@ -169,10 +184,10 @@ export function Hero() {
           style={{ borderTop: "1px solid rgba(0,255,135,0.1)" }}
         >
           {[
-            { label: "Repositories", value: "84" },
-            { label: "GitHub Stars", value: "2.4k" },
-            { label: "Contributions", value: "1,847" },
-            { label: "Followers", value: "312" },
+            { label: "Repositories", value: loading ? "..." : user?.public_repos?.toString() ?? "0" },
+            { label: "GitHub Stars", value: "—" },
+            { label: "Contributions", value: "—" },
+            { label: "Followers", value: loading ? "..." : user?.followers?.toString() ?? "0" },
           ].map((stat) => (
             <div key={stat.label}>
               <div className="font-mono font-bold" style={{ fontSize: "1.6rem", color: "#00ff87" }}>
