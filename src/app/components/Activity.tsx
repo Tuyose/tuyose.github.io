@@ -96,10 +96,10 @@ export function Activity() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="flex flex-col gap-8">
           {/* Contribution heatmap */}
           <div
-            className="lg:col-span-2 p-6"
+            className="p-6"
             style={{
               background: "#0f1512",
               border: "1px solid rgba(0,255,135,0.1)",
@@ -165,27 +165,32 @@ export function Activity() {
                 Loading activity…
               </div>
             ) : recentActivity.length > 0 ? (
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-wrap gap-4">
                 {recentActivity.map((item, i) => (
                   <motion.div
                     key={i}
-                    initial={{ opacity: 0, x: 10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.3, delay: i * 0.07 }}
-                    className="flex flex-col gap-1 pb-4"
-                    style={{ borderBottom: i < recentActivity.length - 1 ? "1px solid rgba(0,255,135,0.06)" : "none" }}
+                    className="flex-1 min-w-[280px]"
+                    style={{
+                      padding: "12px",
+                      background: "rgba(0,255,135,0.03)",
+                      border: "1px solid rgba(0,255,135,0.08)",
+                      borderRadius: "3px",
+                    }}
                   >
                     <div className="font-mono text-xs" style={{ color: "#6b8a6b" }}>
                       {item.action}{" "}
                       <span style={{ color: "#00ff87" }}>{item.target}</span>
                     </div>
                     {item.branch && (
-                      <div className="font-mono text-xs" style={{ color: "rgba(0,255,135,0.4)" }}>
+                      <div className="font-mono text-xs mt-1" style={{ color: "rgba(0,255,135,0.4)" }}>
                         ⎇ {item.branch}
                       </div>
                     )}
-                    <div className="font-mono text-xs" style={{ color: "rgba(107,138,107,0.5)" }}>
+                    <div className="font-mono text-xs mt-1" style={{ color: "rgba(107,138,107,0.5)" }}>
                       {item.time}
                     </div>
                   </motion.div>
