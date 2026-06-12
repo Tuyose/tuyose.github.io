@@ -110,17 +110,12 @@ export function Contact() {
               <div className="ml-4">
                 <span style={{ color: "#00c4ff" }}>"name"</span>
                 {': '}
-                <span style={{ color: "#00ff87" }}>"Alex Chen"</span>,
+                <span style={{ color: "#00ff87" }}>"Yusuf Altunbaş"</span>,
               </div>
               <div className="ml-4">
                 <span style={{ color: "#00c4ff" }}>"role"</span>
                 {': '}
-                <span style={{ color: "#00ff87" }}>"Full-Stack / Systems Engineer"</span>,
-              </div>
-              <div className="ml-4">
-                <span style={{ color: "#00c4ff" }}>"location"</span>
-                {': '}
-                <span style={{ color: "#00ff87" }}>"San Francisco, CA"</span>,
+                <span style={{ color: "#00ff87" }}>"Full-Stack Developer"</span>,
               </div>
               <div className="ml-4">
                 <span style={{ color: "#00c4ff" }}>"available"</span>
