@@ -102,7 +102,7 @@ export function Contact() {
               <div>
                 <span style={{ color: "#00ff87" }}>❯</span>{" "}
                 <span style={{ color: "#e8f0e8" }}>curl</span>{" "}
-                <span style={{ color: "#00c4ff" }}>https://alex.dev/api/contact</span>
+                <span style={{ color: "#00c4ff" }}>https://yusuf.dev/api/contact</span>
               </div>
               <div className="mt-1" style={{ color: "#e8f0e8" }}>
                 {"{"}
